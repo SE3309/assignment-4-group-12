@@ -50,7 +50,25 @@ app.post("/api/rategame/:user_id", (req, res) => {
     );
   });
 });
+ 
+app.put("/api/rategame/:user_id", (req, res) => {
+  const { user_id } = req.params;
+  const { game_id, score, review, rating_date } = req.body;
 
+  connection.query(
+    "UPDATE rating SET review = ?, score = ?, rating_date = ? WHERE user_id = ? AND game_id = ?",
+    [review, score, rating_date, user_id, game_id],
+    (err, results) => {
+      if (err) {
+        console.error(err);
+        res.status(500).send("Error updating rating");
+      } else {
+        res.status(200).send("Rating updated successfully");
+      }
+    }
+  );
+}
+);
 app.delete("/api/rategame/:user_id", (req, res) => {
   const { user_id } = req.params;
   const { game_id } = req.body;
@@ -69,6 +87,23 @@ app.delete("/api/rategame/:user_id", (req, res) => {
   );
 });
 
+app.get("/api/search/:game", (req, res) => {//search for games
+  const { game } = req.params;
+
+  connection.query(
+    "SELECT * FROM VideoGame WHERE title LIKE ?",
+    [`%${game}%`],
+    (err, results) => {
+      if (err) {
+        console.error(err);
+        res.status(500).send("Error searching for games");
+      } else {
+        res.status(200).json(results);
+      }
+    }
+  );
+});
+
 app.listen(3000, () => {
-  console.log("Server is running on port 3000");
+  console.log(`Server running on port $`);
 });
